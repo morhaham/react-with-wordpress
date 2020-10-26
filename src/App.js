@@ -11,21 +11,23 @@ import SinglePost from "./components/SinglePost";
 import withWordpressData from "./withWordpressData";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
-import Navbar from "./components/Navbar";
+import Header from "./components/Header";
 import { UserProvider } from "./userContext";
+import { ThemeProvider } from "@material-ui/core";
+import CreatePost from "./components/CreatePost";
+import clientConfig from "./clientConfig";
 
-const wpSiteUrl = "http://morhaham.local";
-const postsEndpoint = "/wp-json/wp/v2/posts";
+console.log(clientConfig.wpSiteUrl);
 
-const SinglePostWithData = withWordpressData(SinglePost);
-const HomeWithPostsData = withWordpressData(Home);
+const wpSiteUrl = clientConfig.wpSiteUrl;
+const postsEndpoint = clientConfig.postsEndpoint;
 
 class App extends React.Component {
   render() {
     return (
       <UserProvider>
         <Router>
-          <Navbar />
+          <Header />
           <Switch>
             <Route path="/login">
               <Login />
@@ -34,7 +36,7 @@ class App extends React.Component {
             <Route
               path="/post/:id"
               render={(props) => (
-                <SinglePostWithData
+                <SinglePost
                   endpoint={`${wpSiteUrl}${postsEndpoint}/${props.match.params.id}`}
                 />
               )}
@@ -42,7 +44,7 @@ class App extends React.Component {
             <Route
               path="/"
               render={(props) => (
-                <HomeWithPostsData endpoint={`${wpSiteUrl}${postsEndpoint}`} />
+                <Home endpoint={`${wpSiteUrl}${postsEndpoint}`} />
               )}
             />
           </Switch>

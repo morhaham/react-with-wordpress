@@ -1,43 +1,49 @@
 import React from "react";
-import Navbar from "./Navbar";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import renderHTML from "react-render-html";
 import loader from "../loader.svg";
+import withWordpressData from "../withWordpressData";
+import moment from "moment";
+import {
+  Link,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  withStyles,
+  Button,
+} from "@material-ui/core";
+import baseStyles from "../styles";
 
-function Home({ loading, data, error }) {
+const LinkBehavior = React.forwardRef((props, ref) => {
+  return <RouterLink ref={ref} to={props.to} {...props} />;
+});
+
+function Home({ loading, data, error, classes }) {
   const posts = [...data];
   return (
     <>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <div className="posts-container d-flex flex-column align-items-center mt-5 ">
+      {error && <div>{error}</div>}
+      <div className={classes.container}>
         {posts.length
           ? posts.map((post) => (
-              <div
-                key={post.id}
-                className="post card border-dark mb-3"
-                style={{ width: "50rem" }}
-              >
+              <Card key={post.id} className={classes.post} variant="outlined">
                 {/* Card Title */}
-                <div className="card-header">
-                  <Link to={`/post/${post.id}`}>{post.title.rendered}</Link>
-                </div>
+                <Link component={LinkBehavior} to={`/post/${post.id}`}>
+                  <CardHeader title={post.title.rendered}></CardHeader>
+                </Link>
                 {/* Card Body */}
-                <div className="card-body">
-                  <div className="post__content card-text">
-                    {renderHTML(post.excerpt.rendered)}
-                  </div>
-                </div>
+                <CardContent>
+                  <div>{renderHTML(post.excerpt.rendered)}</div>
+                </CardContent>
                 {/* Card Footer */}
-                <div className="post__date card-footer">
-                  {new Date(post.date).toLocaleDateString()}
-                  <Link
-                    to={`/post/${post.id}`}
-                    className="btn btn-secondary float-right"
-                  >
+                <CardActions className={classes.actions}>
+                  <small>{moment(post.date).fromNow()} </small>
+                  <Button component={LinkBehavior} to={`/post/${post.id}`}>
                     Read More..
-                  </Link>
-                </div>
-              </div>
+                  </Button>
+                </CardActions>
+              </Card>
             ))
           : ""}
         {loading && <img className="loader" src={loader} alt="loading" />}
@@ -46,4 +52,20 @@ function Home({ loading, data, error }) {
   );
 }
 
-export default Home;
+const HomeWithStyles = withStyles({
+  container: baseStyles.container,
+  post: {
+    maxWidth: "50rem",
+    minWidth: "300px",
+    marginBottom: 30,
+  },
+  actions: {
+    padding: 15,
+    display: "flex",
+    justifyContent: "space-between",
+  },
+})((props) => {
+  return <Home {...props} />;
+});
+
+export default withWordpressData(HomeWithStyles);

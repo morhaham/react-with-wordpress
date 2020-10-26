@@ -4,12 +4,13 @@ import { Redirect } from "react-router-dom";
 import loader from "../loader.svg";
 import { userContext } from "../userContext";
 import renderHTML from "react-render-html";
+import { Input, InputLabel, Button, withStyles } from "@material-ui/core";
+import baseStyles from "../styles";
 
 class Login extends Component {
   static contextType = userContext;
   constructor(props) {
     super(props);
-    this.user = null;
     this.state = {
       username: "",
       password: "",
@@ -44,9 +45,6 @@ class Login extends Component {
             userNiceName: res.data.user_display_name,
             userEmail: res.data.user_email,
           });
-          this.setState({
-            loading: false,
-          });
         })
         .catch((error) => {
           console.log(error.response.data);
@@ -71,43 +69,52 @@ class Login extends Component {
       );
     }
     const { username, password, loading, error } = this.state;
+    const classes = this.props.classes;
     return (
-      <div className="d-flex flex-column align-items-center mt-5 mb-3">
-        <form onSubmit={this.onFormSubmit}>
-          <label htmlFor="" className="form-group">
-            Username:
-            <input
+      <div className={classes.container}>
+        <form className={classes.loginForm} onSubmit={this.onFormSubmit}>
+          <div className={classes.inputContainer}>
+            <InputLabel htmlFor="username">Username:</InputLabel>
+            <Input
+              autoFocus={true}
               type="text"
-              className="form-control"
               name="username"
+              id="username"
               value={username}
               onChange={this.handleOnChange}
             />
-          </label>
+          </div>
           <br />
-          <label htmlFor="" className="form-group">
-            Password:
-            <input
+          <div className={classes.inputContainer}>
+            <InputLabel htmlFor="password">Password:</InputLabel>
+            <Input
               type="password"
-              className="form-control"
               name="password"
+              id="password"
               value={password}
               onChange={this.handleOnChange}
             />
-          </label>
-          <br />
-          <button
-            className="btn btn-primary mb-3 d-block mx-auto"
-            type="submit"
-          >
+            <br />
+          </div>
+          <Button color="primary" type="submit">
             Login
-          </button>
+          </Button>
         </form>
         {loading && <img src={loader}></img>}
-        {error && <p className="alert-danger">{renderHTML(error)}</p>}
+        {error && <p className={classes.error}>{renderHTML(error)}</p>}
       </div>
     );
   }
 }
 
-export default Login;
+const LoginWithStyles = withStyles({
+  container: baseStyles.container,
+  inputContainer: {
+    marginBottom: 10,
+  },
+  submitButton: {
+    marginTop: 10,
+  },
+})((props) => <Login {...props} />);
+
+export default LoginWithStyles;
